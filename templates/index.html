@@ -6,10 +6,45 @@
     </head>
 
     <body>
+    
      <div class = "container mt-5">
+        <div class="d-flex justify-content-between mb-3">
+            <h3> Welcome {{ username }} </h3>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+        <div class="row mb-4">
+            <div class = "col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Total Employees</h5>
+                        <h2>{{ total_employees or 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class = "col-md-4">
+                <div class = "card">
+                    <div class="card-body">
+                        <h5>Active Employees</h5>
+                        <h2>{{ active_employees or 0 }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class = "col-md-4">
+                <div class = "card">
+                    <div class = "card-body">
+                        <h5> Inactive Employees</h5>
+                        <h2>{{ inactive_employees or 0  }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         <h1>Employee Management System</h1>
         <h2>Add Employee</h2>
-        <form action="/add" method ="POST">
+        <form action="/add" method ="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label>Photo</label>
+                <input type="file" name="photo" class="form-control">
+            </div>
             <div class = "mb-3">
                 <input 
                     class="form-control"
