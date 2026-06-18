@@ -1,10 +1,16 @@
 import os 
+import uuid
 from werkzeug.utils import secure_filename
-from flask import Flask,render_template,request,redirect,session
+from flask import Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from werkzeug.security import (generate_password_hash,check_password_hash)
 from flask_migrate import Migrate
+from openpyxl import Workbook
+from io import BytesIO
+from flask import send_file
+from datetime import datetime, timezone
+
 
 
 app = Flask(__name__)
@@ -31,11 +37,62 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False,unique=True)
     password =db.Column(db.String(255),nullable=False)
 
+class AuditLog(db.Model):
+    id = db.Column(
+        db.Integer, 
+        primary_key=True
+    )
+    username = db.Column(
+        db.String(255),
+        nullable=False
+    )
+    action = db.Column(
+        db.String(255),
+        nullable=False
+    )
+    created_at = db.Column(
+        db.DateTime, 
+        default=datetime.now(timezone.utc)
+    )
+def add_audit_log(action):
+
+    log = AuditLog(
+        username=session['username'],
+        action=action
+    )
+
+    db.session.add(log)
+
+@app.route('/audit-logs')
+def audit_logs():
+
+    if 'username' not in session:
+        return redirect('/login')
+
+    logs = AuditLog.query.order_by(
+        AuditLog.id.desc()
+    ).all()
+
+    return render_template(
+        'audit_logs.html',
+        logs=logs
+    )
 
 @app.route('/')
 def home():
     if 'username' not in session:
         return redirect('/login')
+    
+    total_employees = Employee.query.count()
+    active_employees = Employee.query.filter_by(status='Active').count()
+    inactive_employees = Employee.query.filter_by(status='Inactive').count()
+
+    page = request.args.get(
+        'page',
+        1,
+        type=int
+    )
+
 
     search = request.args.get('search','')
     if search:
@@ -49,12 +106,14 @@ def home():
             Employee.position.contains(search),
             Employee.status.contains(search)
             )
-    ).all()
+        ).all()
     else:
-        employees = Employee.query.all()
-        total_employees = Employee.query.count()
-        active_employees = Employee.query.filter_by(status='Active').count()
-        inactive_employees = Employee.query.filter_by(status='Inactive').count()
+        #employees = Employee.query.all()
+        employees = Employee.query.paginate(
+            page=page,
+            per_page=5
+        )
+        
 
     return render_template(
         'index.html',
@@ -88,6 +147,7 @@ def add_employee():
 
     if photo and photo.filename:
         filename = secure_filename(
+            str(uuid.uuid4()) + "_" +
             photo.filename
         )
         photo.save(
@@ -99,12 +159,14 @@ def add_employee():
 
     existing_employee = Employee.query.filter_by(employee_no=employee_no).first()
     if existing_employee:
-        return """ 
-            <script>
-                alert('Employee Number already exists');
-                window.location.href='/';
-            </script>
-            """
+        #return """ 
+        #    <script>
+        #       alert('Employee Number already exists');
+        #        window.location.href='/';
+        #    </script>
+        #    """
+        flash('Employee Number already exists!','danger') 
+        return redirect('/')
 
     new_employee = Employee(
         employee_no = employee_no,
@@ -117,7 +179,14 @@ def add_employee():
         photo=filename
     )
     db.session.add(new_employee)
+    add_audit_log(
+        f"Added Employee {employee_no}"
+    )
     db.session.commit()
+    flash(
+        'Employee Added Successfully!',
+        'success'
+    )
     return redirect('/')
 
 @app.route('/delete/<int:id>')
@@ -126,9 +195,25 @@ def delete_employee(id):
         return redirect('/login')
 
     employee = Employee.query.get_or_404(id)
-    db.session.delete(employee)
-    db.session.commit()
 
+    if employee.photo:
+        photo_path = os.path.join(
+            app.config['UPLOAD_FOLDER'],
+            employee.photo
+        )
+        if os.path.exists(photo_path):
+            os.remove(photo_path)
+
+    db.session.delete(employee)
+    add_audit_log(
+        f"Deleted Employee {employee.employee_no}"
+    )
+    db.session.commit()
+    flash(
+        'Employee Deleted Successfully',
+        'success'
+
+    )
     return redirect('/')
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -147,6 +232,33 @@ def edit_employee(id):
         employee.department = request.form['department']
         employee.position = request.form['position']
         employee.status = request.form['status']
+        
+        photo = request.files['photo']
+        
+        
+        if photo and photo.filename:
+            if employee.photo:
+                old_photo_path = os.path.join(
+                    app.config['UPLOAD_FOLDER'],
+                    employee.photo
+                )
+                if os.path.exists(old_photo_path):
+                    os.remove(old_photo_path)
+
+            filename = secure_filename(str(uuid.uuid4()) + "_" +photo.filename)
+            
+            photo.save(
+            os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                filename
+                )
+            )
+            
+            employee.photo = filename
+        add_audit_log(
+            f"Updated Employee {employee.employee_no}"
+        )
+
 
         db.session.commit()
         print('saved')
@@ -174,6 +286,19 @@ def create_admin():
 
     return 'Admin Created'
 
+@app.route('/employee/<int:id>')
+def employee_details(id):
+
+    if 'username' not in session:
+        return redirect('/login')
+    
+    employee = Employee.query.get_or_404(id)
+
+    return render_template(
+        'employee_details.html',
+        employee=employee
+    )
+
 @app.route('/login', methods=['GET','POST'])
 def login():
     if 'username' in session:
@@ -193,14 +318,72 @@ def login():
             password
         ):
             session['username'] = user.username
+            log = AuditLog(
+                username=user.username,
+                action="Logged In"
+            )
+            db.session.add(log)
+            db.session.commit()
             return redirect('/')
         return 'Invalid Username or Password'
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
+
+    if 'username' in session:
+        log = AuditLog(
+            username=session['username'],
+            action='Logged Out'
+        )
+        db.session.add(log)
+        db.session.commit()
+        
     session.pop('username',None)
     return redirect('/login')
+
+
+@app.route('/export')
+def export_employees():
+    if 'username' not in session:
+        return redirect('/login')
+    
+    employees = Employee.query.all()
+
+    wb = Workbook()
+    ws= wb.active
+
+    ws.title = "Employees"
+    ws.append([
+        'Employee No',
+        'First Name',
+        'Last Name',
+        'Email',
+        'Department',
+        'Position',
+        'Status'
+    ])
+    for employee in employees:
+        ws.append([
+            employee.employee_no,
+            employee.first_name,
+            employee.last_name, 
+            employee.email,
+            employee.department,
+            employee.position,
+            employee.status
+        ])
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name='employees.xlsx',
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+    )
 
 if __name__ == '__main__':
 
