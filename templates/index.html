@@ -23,74 +23,80 @@
         </div>
         <div class="row mb-4">
             <div class = "col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5>Total Employees</h5>
-                        <h2>{{ total_employees or 0 }}</h2>
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Employees</h6>
+                        <h1 class="fw-bold">{{ total_employees or 0 }}</h1>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class = "card">
-                    <div class="card-body">
-                        <h5>Active Employees</h5>
-                        <h2>{{ active_employees or 0 }}</h2>
+                <div class = "card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Active Employees</h6>
+                        <h1 class="fw-bold">{{ active_employees or 0 }}</h1>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class = "card">
-                    <div class = "card-body">
-                        <h5> Inactive Employees</h5>
-                        <h2>{{ inactive_employees or 0  }}</h2>
+                <div class = "card shadow-sm h-100">
+                    <div class = "card-body text-center">
+                        <h6 class="text-muted"> Inactive Employees</h6>
+                        <h1 class="fw-bold">{{ inactive_employees or 0  }}</h1>
                     </div>
                 </div>
             </div>
         </div>
-        <h1>Employee Management System</h1>
-        <h2>Add Employee</h2>
-        <form action="/add" method ="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                
-                <input type="file" name="photo" class="form-control">
+        <h1 class="mb-4">Employee Management System</h1>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"> Add Employee</h5>
             </div>
-            <div class = "mb-3">
-                <input 
-                    class="form-control"
-                    type="text"
-                    name="employee_no"
-                    placeholder="Employee No"
-                    required         
-                >
+            <div class="card-body">
+                <form action="/add" method ="POST" enctype="multipart/form-data">
+                    
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input 
+                        class="form-control" 
+                        type="text"
+                        name="employee_no"
+                        placeholder="Employee No"
+                        required
+                        >
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input
+                        class="form-control" 
+                        type="text"
+                        name="first_name"
+                        placeholder="First Name"
+                        required
+                    >
+                </div>
             </div>
-            <div class = "mb-3">
-                <input
-                    class="form-control"
-                    type="text"
-                    name="first_name"
-                    placeholder="First Name"
-                    required
-                >
+            <div class="row">
+                <div class = "col-md-6 mb-3">
+                    <input
+                        class="form-control"
+                        type="text"
+                        name = "last_name"
+                        placeholder="Last Name"
+                        required
+                    >
+                </div>
+                <div class = "col-md-6 mb-3">
+                    <input
+                        class="form-control"
+                        type="email"
+                        name = "email"
+                        placeholder="Email"
+                        required
+                    >
+                </div>
             </div>
-            <div class = "mb-3">
-                <input
-                    class="form-control"
-                    type="text"
-                    name = "last_name"
-                    placeholder="Last Name"
-                    required
-                >
-            </div>
-            <div class = "mb-3">
-                <input
-                    class="form-control"
-                    type="email"
-                    name = "email"
-                    placeholder="Email"
-                    required
-                >
-            </div>
-            <div class = "mb-3">
+        <div class="row">
+            <div class = "col-md-6 mb-3">
                 <select name="department" class="form-control" required>
                     <option value="">Select Department</option>
                     <option value="IT">IT</option>
@@ -99,7 +105,7 @@
                     <option value="Finance">Finance</option>
                 </select>
             </div>
-            <div class = "mb-3">
+            <div class = "col-md-6 mb-3">
                 <input
                     class="form-control" 
                     type="text"
@@ -107,7 +113,18 @@
                     placeholder="Position"
                 >          
             </div>
-            <div class="mb-3">
+        </div>
+        <div class="row">
+            
+            <div class="col-md-6 mb-3">
+                <input 
+                    type="file"
+                    name="photo"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="col-md-6 mb-3">
                 <select name="status" class="form-control" required>
                     <option value="">Select Status</option>
                     <option value="Active">Active</option>
@@ -115,14 +132,22 @@
                 </select>
 
             </div>
+        </div>
             
-            <button class="btn btn-primary"> Add Employee </button>
+           <div class="text-center">
+                <button class="btn btn-primary px-5"> Add Employee </button>
+           </div>
+
 
         </form>
+            </div>
+        </div>
+        
+        
         <hr>
         <form method="GET">
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="d-flex gap-2 mb-3">
                     <input 
                     type="text"
                     class="form-control"
@@ -131,24 +156,27 @@
                     value="{{ search }}"
                     >
                 </div>
-                <div class="col-md-2">
+                <div class="d-flex gap-2 mb-3">
                     <button  class="btn btn-success"
                     type="submit">
                         Search
                     </button>
 
                 </div>
-                <div class="col-md-2">
+                <div class="d-flex gap-2 mb-3">
+                    
+
                     <a href="/export" class="btn btn-success mb-3"> Export Excel </a>
                 </div>
-                <div class="col-md-2">
+                <div class="d-flex gap-2 mb-3">
                     <a href="/audit-logs" class="btn btn-dark mb-3">Audit Logs</a>
                 </div>
             </div>
         </form>
     <div class="container-fluid">
-     <table class="table table-bordered">
-        <thead>
+     <table class="table table-bordered table-hover align-middle">
+
+        <thead class="table-dark text-center">
             <tr>
                 <th class="text-center">Photo</th>
                 <th class="text-center">Emp No</th>
@@ -163,7 +191,7 @@
             </tr>
         </thead>
      <tbody>
-        {% for employee in employees %}
+        {% for employee in employees.items %}
         <tr>
             <td>
                  {% if employee.photo %}
@@ -202,6 +230,33 @@
         {% endfor %}
      </tbody>
      </table>
+     <nav>
+        <ul class="pagination justify-content-center">
+            {% if employees.has_prev %}
+            <li class="page-item">
+                <a href="?page={{ employees.prev_num }}" class="page-link"> Previous </a>
+            </li>
+            {% endif %}
+            {% for num in employees.iter_pages() %}
+                {% if num %}
+                    <li 
+                        class="page-item
+                        {% if num == employees.page %}
+                        active
+                        {% endif %}"
+                    >
+                    <a href="?page={{ num }}" class="page-link"> {{ num }} </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if employees.has_next %}
+            <li class="page-item">
+                <a href="?page={{ employees.next_num }}" class="page-link"> Next </a>
+            </li>
+            {% endif %}
+        </ul>
+     </nav>
      </div>
      </div>
     </body>

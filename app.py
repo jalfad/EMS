@@ -52,7 +52,8 @@ class AuditLog(db.Model):
     )
     created_at = db.Column(
         db.DateTime, 
-        default=datetime.now(timezone.utc)
+        default=datetime.now(timezone.utc)  
+
     )
 def add_audit_log(action):
 
@@ -106,7 +107,7 @@ def home():
             Employee.position.contains(search),
             Employee.status.contains(search)
             )
-        ).all()
+        ).paginate(page=page,per_page=5)
     else:
         #employees = Employee.query.all()
         employees = Employee.query.paginate(
