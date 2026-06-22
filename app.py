@@ -149,7 +149,7 @@ def add_employee():
     if photo and photo.filename:
         filename = secure_filename(
             str(uuid.uuid4()) + "_" +
-            photo.filename
+            photo.filename                                                                                                                 
         )
         photo.save(
             os.path.join(
