@@ -17,32 +17,39 @@
     <body>
     
      <div class = "container mt-5">
-        <div class="d-flex justify-content-between mb-3">
-            <h3> Welcome {{ username }} </h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-0"> Welcome, {{ username }} </h2>
+
+                <small class="text-muted">
+                    Employee Management Dashboard
+                </small>
+            </div>
+            
             <a href="/logout" class="btn btn-danger">Logout</a>
         </div>
         <div class="row mb-4">
             <div class = "col-md-4">
-                <div class="card shadow-sm h-100">
+                <div class="card border-primary shadow-sm h-100">
                     <div class="card-body text-center">
                         <h6 class="text-muted">Total Employees</h6>
-                        <h1 class="fw-bold">{{ total_employees or 0 }}</h1>
+                        <h1 class="fw-bold text-primary">{{ total_employees or 0 }}</h1>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class = "card shadow-sm h-100">
+                <div class = "card border-success shadow-sm h-100">
                     <div class="card-body text-center">
                         <h6 class="text-muted">Active Employees</h6>
-                        <h1 class="fw-bold">{{ active_employees or 0 }}</h1>
+                        <h1 class="fw-bold text-success">{{ active_employees or 0 }}</h1>
                     </div>
                 </div>
             </div>
             <div class = "col-md-4">
-                <div class = "card shadow-sm h-100">
+                <div class = "card border-danger shadow-sm h-100">
                     <div class = "card-body text-center">
                         <h6 class="text-muted"> Inactive Employees</h6>
-                        <h1 class="fw-bold">{{ inactive_employees or 0  }}</h1>
+                        <h1 class="fw-bold text-danger">{{ inactive_employees or 0  }}</h1>
                     </div>
                 </div>
             </div>
@@ -146,34 +153,49 @@
         
         <hr>
         <form method="GET">
-            <div class="row mb-3">
-                <div class="d-flex gap-2 mb-3">
-                    <input 
-                    type="text"
-                    class="form-control"
-                    name="search"
-                    placeholder="Search Employee"
-                    value="{{ search }}"
-                    >
-                </div>
-                <div class="d-flex gap-2 mb-3">
-                    <button  class="btn btn-success"
-                    type="submit">
-                        Search
-                    </button>
 
-                </div>
-                <div class="d-flex gap-2 mb-3">
-                    
+    <div class="row mb-4 align-items-center">
 
-                    <a href="/export" class="btn btn-success mb-3"> Export Excel </a>
-                </div>
-                <div class="d-flex gap-2 mb-3">
-                    <a href="/audit-logs" class="btn btn-dark mb-3">Audit Logs</a>
-                </div>
-            </div>
-        </form>
-    <div class="container-fluid">
+        <div class="col-md-4">
+            <input
+                type="text"
+                class="form-control"
+                name="search"
+                placeholder="Search Employee"
+                value="{{ search }}"
+            >
+        </div>
+
+        <div class="col-md-2">
+            <button
+                class="btn btn-success w-100"
+                type="submit"
+            >
+                Search
+            </button>
+        </div>
+
+        <div class="col-md-2">
+            <a
+                href="/export"
+                class="btn btn-success w-100"
+            >
+                Export Excel
+            </a>
+        </div>
+
+        <div class="col-md-2">
+            <a
+                href="/audit-logs"
+                class="btn btn-dark w-100"
+            >
+                Audit Logs
+            </a>
+        </div>
+
+    </div>
+
+</form>
      <table class="table table-bordered table-hover align-middle">
 
         <thead class="table-dark text-center">
@@ -213,7 +235,17 @@
             <td class="text-center">{{ employee.email }}</td>
             <td class="text-center">{{ employee.department }}</td>
             <td class="text-center">{{ employee.position }}</td>
-            <td class="text-center">{{ employee.status }}</td>
+            <td class="text-center">
+                {% if employee.status == 'Active' %}
+
+                    <span class="badge bg-success">Active</span>
+
+                {% else %}
+
+                    <span class="badge bg-danger">Inactive</span>
+
+                {% endif %}
+            </td>
            
             <td class="text-center" >
                 <a class = "btn btn-warning btn-sm" href="/edit/{{ employee.id }}">
@@ -257,7 +289,6 @@
             {% endif %}
         </ul>
      </nav>
-     </div>
      </div>
     </body>
 </html>
