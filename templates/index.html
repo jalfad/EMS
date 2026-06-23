@@ -213,6 +213,7 @@
             </tr>
         </thead>
      <tbody>
+    {% if employees.items %}
         {% for employee in employees.items %}
         <tr>
             <td>
@@ -260,13 +261,20 @@
             </td>
         </tr>
         {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="9" class="text-center text-muted py-4">
+            No employees found.
+        </td>
+    </tr>
+    {% endif %}
      </tbody>
      </table>
      <nav>
         <ul class="pagination justify-content-center">
             {% if employees.has_prev %}
             <li class="page-item">
-                <a href="?page={{ employees.prev_num }}" class="page-link"> Previous </a>
+                <a href="?page={{ employees.prev_num }} &search={{ search }}"  class="page-link"> Previous </a>
             </li>
             {% endif %}
             {% for num in employees.iter_pages() %}
@@ -277,14 +285,14 @@
                         active
                         {% endif %}"
                     >
-                    <a href="?page={{ num }}" class="page-link"> {{ num }} </a>
+                    <a href="?page={{ num }}&search={{ search }}" class="page-link"> {{ num }} </a>
                     </li>
                 {% endif %}
             {% endfor %}
             
             {% if employees.has_next %}
             <li class="page-item">
-                <a href="?page={{ employees.next_num }}" class="page-link"> Next </a>
+                <a href="?page={{ employees.next_num }} &search={{ search }}" class="page-link"> Next </a>
             </li>
             {% endif %}
         </ul>
