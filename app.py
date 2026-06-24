@@ -484,6 +484,23 @@ def create_db():
 
     return "Database Created Successfully!"
 
+@app.route('/create-admin')
+def create_admin():
+
+    existing_user = User.query.filter_by(
+        username='admin'
+    ).first()
+    if existing_user:
+        return "Admin already exists"
+
+    admin = User(
+        username= 'admin',
+        password=generate_password_hash('admin123')
+    )
+    db.session.add(admin)
+    db.session.commit()
+    return "Admin Created Successfully!"
+
 if __name__ == '__main__':
 
     with app.app_context():
