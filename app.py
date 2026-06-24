@@ -477,6 +477,12 @@ def export_employees():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
     )
+@app.route('/create-db')
+def create_db():
+    with app.app_context():
+        db.create_all()
+
+    return "Database Created Successfully!"
 
 if __name__ == '__main__':
 
