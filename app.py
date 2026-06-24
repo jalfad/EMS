@@ -17,8 +17,8 @@ from datetime import datetime
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = 'super-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employees.db'
+app.secret_key = os.getenv('SECRET_KEY','super-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','sqlite:///employees.db')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
 
