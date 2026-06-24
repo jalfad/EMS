@@ -485,7 +485,7 @@ def create_db():
     return "Database Created Successfully!"
 
 @app.route('/create-admin_a')
-def create_admin():
+def create_admin_a():
 
     existing_user = User.query.filter_by(
         username='admin'
