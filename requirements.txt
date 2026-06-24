@@ -17,6 +17,7 @@ MarkupSafe==3.0.3
 openpyxl==3.1.5
 packaging==26.2
 psycopg2-binary==2.9.12
+python-dotenv==1.2.2
 six==1.17.0
 SQLAlchemy==2.0.50
 typing_extensions==4.15.0

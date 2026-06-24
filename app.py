@@ -1,5 +1,6 @@
 import os 
 import uuid
+import cloudinary
 from werkzeug.utils import secure_filename
 from flask import Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
@@ -12,15 +13,24 @@ from flask import send_file
 from datetime import datetime, timezone
 from openpyxl.styles import Font
 from datetime import datetime
+from dotenv import load_dotenv
 
-
+load_dotenv()
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = os.getenv('SECRET_KEY','super-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','sqlite:///employees.db')
+app.secret_key = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
+cloudinary.config(
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
+if not app.secret_key:
+    raise ValueError("SECRET_KEY environment variable is not set")
+
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
