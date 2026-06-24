@@ -70,10 +70,19 @@ def audit_logs():
 
     if 'username' not in session:
         return redirect('/login')
+    
+    page = request.args.get(
+        'page',
+        1,
+        type=int
+    )
 
     logs = AuditLog.query.order_by(
         AuditLog.id.desc()
-    ).all()
+    ).paginate(
+        page=page,
+        per_page=10
+    )
 
     return render_template(
         'audit_logs.html',
