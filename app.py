@@ -477,29 +477,6 @@ def export_employees():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
     )
-@app.route('/create-db')
-def create_db():
-    with app.app_context():
-        db.create_all()
-
-    return "Database Created Successfully!"
-
-@app.route('/create-admin_a')
-def create_admin_a():
-
-    existing_user = User.query.filter_by(
-        username='admin'
-    ).first()
-    if existing_user:
-        return "Admin already exists"
-
-    admin = User(
-        username= 'admin',
-        password=generate_password_hash('admin123')
-    )
-    db.session.add(admin)
-    db.session.commit()
-    return "Admin Created Successfully!"
 
 if __name__ == '__main__':
 
