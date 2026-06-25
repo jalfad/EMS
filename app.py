@@ -1,6 +1,7 @@
 import os 
 import uuid
 import cloudinary
+import requests
 from werkzeug.utils import secure_filename
 from flask import Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +15,7 @@ from datetime import datetime, timezone
 from openpyxl.styles import Font
 from datetime import datetime
 from dotenv import load_dotenv
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -66,6 +68,7 @@ class AuditLog(db.Model):
         default=datetime.now(timezone.utc)  
 
     )
+    
 def add_audit_log(action):
 
     log = AuditLog(
@@ -165,6 +168,8 @@ def add_employee():
     photo = request.files['photo']
 
     filename = None
+    photo_source = None
+
 
     if photo and photo.filename:
         filename = secure_filename(
