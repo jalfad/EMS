@@ -43,7 +43,7 @@ class Employee(db.Model):
     position = db.Column(db.String(100), nullable = False)
     status = db.Column(db.String(20), nullable = False)
     photo = db.Column(db.String(255), nullable=True)
-    photo_source = db.Column(db.String(20), nullable=False,default="local")
+    photo_source = db.Column(db.String(20), nullable=True,default="local")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -202,7 +202,8 @@ def add_employee():
         department = department,
         position = position,
         status = status,
-        photo=filename
+        photo=filename,
+        photo_source =photo_source
     )
     db.session.add(new_employee)
     add_audit_log(
@@ -221,14 +222,14 @@ def delete_employee(id):
         return redirect('/login')
 
     employee = Employee.query.get_or_404(id)
-
-    if employee.photo:
-        photo_path = os.path.join(
+    if employee.photo_source == "local":
+        if employee.photo:
+            photo_path = os.path.join(
             app.config['UPLOAD_FOLDER'],
             employee.photo
-        )
-        if os.path.exists(photo_path):
-            os.remove(photo_path)
+            )
+            if os.path.exists(photo_path):
+                os.remove(photo_path)
 
     db.session.delete(employee)
     add_audit_log(
@@ -263,24 +264,37 @@ def edit_employee(id):
         
         
         if photo and photo.filename:
-            if employee.photo:
-                old_photo_path = os.path.join(
+            if employee.photo_source == "local":
+
+                if employee.photo:
+                    old_photo_path = os.path.join(
                     app.config['UPLOAD_FOLDER'],
                     employee.photo
-                )
-                if os.path.exists(old_photo_path):
-                    os.remove(old_photo_path)
+                    )
+                    if os.path.exists(old_photo_path):
+                        os.remove(old_photo_path)
+            
+            if os.getenv("IS_CLOUD") == "true":
 
-            filename = secure_filename(str(uuid.uuid4()) + "_" +photo.filename)
-            
-            photo.save(
-            os.path.join(
-                app.config['UPLOAD_FOLDER'],
-                filename
+                result = cloudinary.uploader.upload(photo)
+                employee.photo = result["secure_url"]
+                employee.photo_source = "cloudinary"
+            else:
+                filename = secure_filename(
+                    str(uuid.uuid4()) + "_" + photo.filename
                 )
-            )
-            
+
+                photo.save(
+                    os.path.join(
+                        app.config['UPLOAD_FOLDER'],
+                        filename
+                    )
+                )   
+
             employee.photo = filename
+            employee.photo_source = "local"
+
+                
         add_audit_log(
             f"Updated Employee {employee.employee_no}"
         )
