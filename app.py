@@ -1,7 +1,6 @@
 import os 
 import uuid
 import cloudinary
-import requests
 from werkzeug.utils import secure_filename
 from flask import Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
@@ -44,6 +43,7 @@ class Employee(db.Model):
     position = db.Column(db.String(100), nullable = False)
     status = db.Column(db.String(20), nullable = False)
     photo = db.Column(db.String(255), nullable=True)
+    photo_source = db.Column(db.String(20), nullable=False,default="local")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -171,17 +171,17 @@ def add_employee():
     photo_source = None
 
 
-    if photo and photo.filename:
-        filename = secure_filename(
-            str(uuid.uuid4()) + "_" +
-            photo.filename                                                                                                                 
-        )
+    if os.getenv("IS_CLOUD") == "true":
+        result = cloudinary.uploader.upload(photo)
+        filename = result["secure_url"]
+        photo_source = "cloudinary"
+    else:
+        filename =secure_filename( str(uuid.uuid4()) + "_" + photo.filename)
+
         photo.save(
-            os.path.join(
-                app.config['UPLOAD_FOLDER'],
-                filename
-            )
+            os.path.join(app.config["UPLOAD_FOLDER"], filename)
         )
+        photo_source = "local"
 
     existing_employee = Employee.query.filter_by(employee_no=employee_no).first()
     if existing_employee:
