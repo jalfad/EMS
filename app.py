@@ -291,10 +291,16 @@ def edit_employee(id):
                         os.remove(old_photo_path)
             
             if os.getenv("IS_CLOUD") == "true":
+                if employee.cloudinary_public_id:
+                    cloudinary.uploader.destroy(
+                        employee.cloudinary_public_id
+                    )
 
                 result = cloudinary.uploader.upload(photo)
+
                 employee.photo = result["secure_url"]
                 employee.photo_source = "cloudinary"
+                employee.cloudinary_public_id = result["public_id"]
             else:
                 filename = secure_filename(
                     str(uuid.uuid4()) + "_" + photo.filename
@@ -309,6 +315,7 @@ def edit_employee(id):
 
             employee.photo = filename
             employee.photo_source = "local"
+            employee.cloudinary_public_id = None
 
                 
         add_audit_log(
