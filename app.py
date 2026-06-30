@@ -336,7 +336,7 @@ def edit_employee(id):
 @app.route('/create-admin')
 def create_admin():
 
-    return 'Disabled'
+    #return 'Disabled'
 
     hashed_password = generate_password_hash('admin123')
 
