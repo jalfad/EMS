@@ -16,6 +16,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 
+
 load_dotenv()
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
@@ -24,6 +25,10 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
+from flask_migrate import upgrade
+
+with app.app_context():
+    upgrade()
 cloudinary.config(
     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
@@ -227,13 +232,20 @@ def delete_employee(id):
 
     employee = Employee.query.get_or_404(id)
     if employee.photo_source == "local":
-        if employee.photo:
-            photo_path = os.path.join(
-            app.config['UPLOAD_FOLDER'],
-            employee.photo
-            )
-            if os.path.exists(photo_path):
-                os.remove(photo_path)
+       if employee.photo:
+           
+           photo_path = os.path.join(
+               app.config["UPLOAD_FOLDER"],
+               employee.photo
+           )
+
+           if os.path.exists(photo_path):
+               os.remove(photo_path)
+    elif employee.photo_source == "cloudinary":
+        if employee.cloudinary_public_id:
+            cloudinary.uploader.destroy(
+                employee.cloudinary_public_id
+            )  
 
     db.session.delete(employee)
     add_audit_log(
@@ -513,7 +525,6 @@ def export_employees():
 
 if __name__ == '__main__':
 
-    with app.app_context():
-        db.create_all()
-
-    app.run(debug=True)
+    #with app.app_context():
+       #db.create_all()
+      app.run(debug=True)
