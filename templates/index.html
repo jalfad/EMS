@@ -217,17 +217,24 @@
         {% for employee in employees.items %}
         <tr>
             <td>
-                 {% if employee.photo %}
-                    <img
-                        src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
-                        width="60"
-                        height="60"
-                        style="object-fit: cover;border-radius: 50%;"
-                    >
-                 {% else %}
-                 
-                 No Photo
-                 {% endif %}
+                {% if employee.photo %}
+                    {% if employee.photo_source == "cloudinary" %}
+                        <img src="{{ employee.photo }}" 
+                             width="60"
+                             height="60"
+                             style="object-fit: cover; border-radius: 50%;"
+                        >
+                    {% else %}
+
+                        <img src="{{ url_for('static', filename='uploads/' + employee.photo ) }}" 
+                             width="60"
+                             height="60"
+                             style="object-fit: cover; border-radius: 50%;">
+                    {% endif %}
+                {% else %}
+                    No Photo
+                {% endif %}
+
 
             </td>
             <td class="text-center" >{{ employee.employee_no }} </td>

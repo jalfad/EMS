@@ -44,6 +44,7 @@ class Employee(db.Model):
     status = db.Column(db.String(20), nullable = False)
     photo = db.Column(db.String(255), nullable=True)
     photo_source = db.Column(db.String(20), nullable=True,default="local")
+    cloudinary_public_id = db.Column(db.String(255), nullable =True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -169,12 +170,14 @@ def add_employee():
 
     filename = None
     photo_source = None
+    cloudinary_public_id = None
 
 
     if os.getenv("IS_CLOUD") == "true":
         result = cloudinary.uploader.upload(photo)
         filename = result["secure_url"]
         photo_source = "cloudinary"
+        cloudinary_public_id = result["public_id"]
     else:
         filename =secure_filename( str(uuid.uuid4()) + "_" + photo.filename)
 
@@ -203,7 +206,8 @@ def add_employee():
         position = position,
         status = status,
         photo=filename,
-        photo_source =photo_source
+        photo_source =photo_source,
+        cloudinary_public_id = cloudinary_public_id
     )
     db.session.add(new_employee)
     add_audit_log(

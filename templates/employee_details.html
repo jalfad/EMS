@@ -28,11 +28,22 @@
                 <div class="card-body text-center">
 
                     {% if employee.photo %}
-                    <img
-                        src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
-                        width="120"
-                        height="120"
-                        style="object-fit: cover; border-radius: 50%;">
+                        {% if employee.photo_source == "cloudinary" %}
+                            <img 
+                                src="{{ employee.photo }}"
+                                width="150"
+                                height="150"
+                                style="object-fit: cover; border-radius: 50%;"
+                            >
+                        {% else %}
+                            <img 
+                                src="{{ url_for('static', filename='uploads/' + employee.photo)}}"
+                                width="150"
+                                height="150"
+                                style="object-fit: cover; border-radius: 50%;"
+                                >
+                        {% endif %}
+
                     {% endif %}
 
                     <h3 class="mt-3 mb-1">
