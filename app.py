@@ -1,6 +1,8 @@
 import os 
 import uuid
 import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 from werkzeug.utils import secure_filename
 from flask import Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
@@ -278,22 +280,13 @@ def edit_employee(id):
         
         photo = request.files['photo']
         
-        
         if photo and photo.filename:
-            if employee.photo_source == "local":
 
-                if employee.photo:
-                    old_photo_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'],
-                    employee.photo
-                    )
-                    if os.path.exists(old_photo_path):
-                        os.remove(old_photo_path)
-            
             if os.getenv("IS_CLOUD") == "true":
+
                 if employee.cloudinary_public_id:
                     cloudinary.uploader.destroy(
-                        employee.cloudinary_public_id
+                    employee.cloudinary_public_id
                     )
 
                 result = cloudinary.uploader.upload(photo)
@@ -301,21 +294,32 @@ def edit_employee(id):
                 employee.photo = result["secure_url"]
                 employee.photo_source = "cloudinary"
                 employee.cloudinary_public_id = result["public_id"]
+
             else:
-                filename = secure_filename(
-                    str(uuid.uuid4()) + "_" + photo.filename
-                )
+
+                if employee.photo_source == "local" and employee.photo:
+
+                    old_photo_path = os.path.join(
+                    app.config['UPLOAD_FOLDER'],
+                    employee.photo
+                    )
+
+                if os.path.exists(old_photo_path):
+                    os.remove(old_photo_path)
+
+                filename = secure_filename(str(uuid.uuid4()) + "_" + photo.filename)
 
                 photo.save(
                     os.path.join(
-                        app.config['UPLOAD_FOLDER'],
-                        filename
+                    app.config['UPLOAD_FOLDER'],
+                    filename
                     )
-                )   
+                )
 
-            employee.photo = filename
-            employee.photo_source = "local"
-            employee.cloudinary_public_id = None
+        employee.photo = filename
+        employee.photo_source = "local"
+        employee.cloudinary_public_id = None
+        
 
                 
         add_audit_log(
