@@ -179,30 +179,32 @@ def add_employee():
     photo_source = None
     cloudinary_public_id = None
 
+    is_cloud = os.getenv("IS_CLOUD", "").strip().lower()
 
-    if os.getenv("IS_CLOUD") == "true":
+    print("IS_CLOUD =", repr(is_cloud))
+
+    if is_cloud == "true":
+        print(">>> USING CLOUDINARY")
+
         result = cloudinary.uploader.upload(photo)
+
         filename = result["secure_url"]
         photo_source = "cloudinary"
         cloudinary_public_id = result["public_id"]
+
     else:
-        filename =secure_filename( str(uuid.uuid4()) + "_" + photo.filename)
+        print(">>> USING LOCAL")
+
+        filename = secure_filename(
+        str(uuid.uuid4()) + "_" + photo.filename
+        )
 
         photo.save(
-            os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        os.path.join(app.config["UPLOAD_FOLDER"], filename)
         )
-        photo_source = "local"
 
-    existing_employee = Employee.query.filter_by(employee_no=employee_no).first()
-    if existing_employee:
-        #return """ 
-        #    <script>
-        #       alert('Employee Number already exists');
-        #        window.location.href='/';
-        #    </script>
-        #    """
-        flash('Employee Number already exists!','danger') 
-        return redirect('/')
+        photo_source = "local"
+    
 
     new_employee = Employee(
         employee_no = employee_no,
