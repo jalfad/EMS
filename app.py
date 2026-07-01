@@ -125,13 +125,6 @@ def debug():
     """
     return result
 
-@app.route("/delete-all")
-def delete_all():
-
-    Employee.query.delete()
-    db.session.commit()
-
-    return "Deleted"
 #------
 
 @app.route('/')
