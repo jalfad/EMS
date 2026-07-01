@@ -282,14 +282,15 @@ def edit_employee(id):
         employee.status = request.form['status']
         
         photo = request.files['photo']
-        
         if photo and photo.filename:
 
-            if os.getenv("IS_CLOUD") == "true":
+            is_cloud = os.getenv("IS_CLOUD", "").strip().lower()
+
+            if is_cloud == "true":
 
                 if employee.cloudinary_public_id:
                     cloudinary.uploader.destroy(
-                    employee.cloudinary_public_id
+                        employee.cloudinary_public_id
                     )
 
                 result = cloudinary.uploader.upload(photo)
@@ -303,27 +304,30 @@ def edit_employee(id):
                 if employee.photo_source == "local" and employee.photo:
 
                     old_photo_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'],
+                    app.config["UPLOAD_FOLDER"],
                     employee.photo
                     )
 
-                if os.path.exists(old_photo_path):
-                    os.remove(old_photo_path)
+                    if os.path.exists(old_photo_path):
+                        os.remove(old_photo_path)
 
-                filename = secure_filename(str(uuid.uuid4()) + "_" + photo.filename)
+                os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+                filename = secure_filename(
+                    str(uuid.uuid4()) + "_" + photo.filename
+                    )
 
                 photo.save(
                     os.path.join(
-                    app.config['UPLOAD_FOLDER'],
+                    app.config["UPLOAD_FOLDER"],
                     filename
-                    )
                 )
+            )
 
-        employee.photo = filename
-        employee.photo_source = "local"
-        employee.cloudinary_public_id = None
+            employee.photo = filename
+            employee.photo_source = "local"
+            employee.cloudinary_public_id = None
         
-
                 
         add_audit_log(
             f"Updated Employee {employee.employee_no}"
