@@ -358,9 +358,9 @@ def edit_employee(id):
                 )
             )
 
-            employee.photo = filename
-            employee.photo_source = "local"
-            employee.cloudinary_public_id = None
+                employee.photo = filename
+                employee.photo_source = "local"
+                employee.cloudinary_public_id = None
         
                 
         add_audit_log(
