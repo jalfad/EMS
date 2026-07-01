@@ -181,7 +181,7 @@ def add_employee():
 
     is_cloud = os.getenv("IS_CLOUD", "").strip().lower()
 
-    print("IS_CLOUD =", repr(is_cloud))
+    raise Exception(f"IS_CLOUD = {repr(is_cloud)}")
 
     if is_cloud == "true":
         print(">>> USING CLOUDINARY")
