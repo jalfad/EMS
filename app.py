@@ -109,7 +109,20 @@ def audit_logs():
         'audit_logs.html',
         logs=logs
     )
+@app.route("/debug")
+def debug():
 
+    employees = Employee.query.all()
+
+    result = ""
+
+    for emp in employees:
+        result += f"""
+    Employee No: {emp.employee_no}<br>
+    Photo Source: {emp.photo_source}<br>
+    Photo: {emp.photo}<br><br>
+    """
+    return result
 @app.route('/')
 def home():
     if 'username' not in session:
@@ -151,7 +164,7 @@ def home():
         print("Employee No:", employee.employee_no)
         print("Photo Source:", employee.photo_source)
         print("Photo:", employee.photo) 
-        
+
     return render_template(
         'index.html',
         employees=employees,
