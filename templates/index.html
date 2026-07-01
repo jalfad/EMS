@@ -218,21 +218,33 @@
         <tr>
             <td>
                 {% if employee.photo %}
-                    {% if employee.photo_source == "cloudinary" %}
-                        <img src="{{ employee.photo }}" 
-                             width="60"
-                             height="60"
-                             style="object-fit: cover; border-radius: 50%;"
-                        >
+
+                    {% if employee.photo.startswith('http') %}
+
+                    <img
+                        src="{{ employee.photo }}"
+                        width="60"
+                        height="60"
+                        style="object-fit:cover;border-radius:50%;"
+                        onerror="this.style.border='2px solid red';"
+                    >
+
                     {% else %}
 
-                        <img src="{{ url_for('static', filename='uploads/' + employee.photo ) }}" 
-                             width="60"
-                             height="60"
-                             style="object-fit: cover; border-radius: 50%;">
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
+                            width="60"
+                            height="60"
+                            style="object-fit:cover;border-radius:50%;"
+                            onerror="this.style.border='2px solid red';"
+                        >
+
                     {% endif %}
+
                 {% else %}
+
                     No Photo
+
                 {% endif %}
 
 
