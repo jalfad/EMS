@@ -181,10 +181,7 @@ def add_employee():
 
     is_cloud = os.getenv("IS_CLOUD", "").strip().lower()
 
-    raise Exception(f"IS_CLOUD = {repr(is_cloud)}")
-
     if is_cloud == "true":
-        print(">>> USING CLOUDINARY")
 
         result = cloudinary.uploader.upload(photo)
 
@@ -193,14 +190,18 @@ def add_employee():
         cloudinary_public_id = result["public_id"]
 
     else:
-        print(">>> USING LOCAL")
+
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
         filename = secure_filename(
-        str(uuid.uuid4()) + "_" + photo.filename
+            str(uuid.uuid4()) + "_" + photo.filename
         )
 
         photo.save(
-        os.path.join(app.config["UPLOAD_FOLDER"], filename)
+         os.path.join(
+             app.config["UPLOAD_FOLDER"],
+             filename
+            )
         )
 
         photo_source = "local"
