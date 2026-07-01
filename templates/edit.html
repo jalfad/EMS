@@ -124,8 +124,27 @@
         </div>
         <div class="mb-3">
          {% if employee.photo %}
-        <img id="photo-preview" src="{{ url_for('static', filename='uploads/' + employee.photo)}}" width="100" height="100" style="object-fit: cover;border-radius: 50%;">
-         {{ employee.photo }}
+
+            {% if employee.photo_source == "cloudinary" %}
+
+                <img
+                id="photo-preview"
+                src="{{ employee.photo }}"
+                width="100"
+                height="100"
+                style="object-fit:cover;border-radius:50%;">
+
+            {% else %}
+
+            <img
+                id="photo-preview"
+                src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
+                width="100"
+                height="100"
+                style="object-fit:cover;border-radius:50%;">
+
+            {% endif %}
+
         {% endif %}
         </div>
         <div class="mb-3">

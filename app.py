@@ -170,11 +170,7 @@ def home():
             per_page=5
         )
         
-    for employee in employees.items:
-        print("==========================")
-        print("Employee No:", employee.employee_no)
-        print("Photo Source:", employee.photo_source)
-        print("Photo:", employee.photo) 
+
 
     return render_template(
         'index.html',
