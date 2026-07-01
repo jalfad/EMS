@@ -109,6 +109,7 @@ def audit_logs():
         'audit_logs.html',
         logs=logs
     )
+#tempo--
 @app.route("/debug")
 def debug():
 
@@ -123,6 +124,16 @@ def debug():
     Photo: {emp.photo}<br><br>
     """
     return result
+
+@app.route("/delete-all")
+def delete_all():
+
+    Employee.query.delete()
+    db.session.commit()
+
+    return "Deleted"
+#------
+
 @app.route('/')
 def home():
     if 'username' not in session:
