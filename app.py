@@ -124,6 +124,13 @@ def debug():
     Photo: {emp.photo}<br><br>
     """
     return result
+@app.route("/env")
+def env():
+    return f"""
+IS_CLOUD = {os.getenv("IS_CLOUD")} <br>
+DATABASE_URL = {os.getenv("DATABASE_URL")} <br>
+CLOUDINARY_CLOUD_NAME = {os.getenv("CLOUDINARY_CLOUD_NAME")}
+"""
 
 #------
 
