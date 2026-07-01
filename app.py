@@ -158,13 +158,10 @@ def home():
     )
 
 @app.route('/add', methods=['POST'])
-
 def add_employee():
 
     if 'username' not in session:
         return redirect('/login')
-    
-
 
     employee_no = request.form['employee_no']
     first_name = request.form['first_name']
@@ -175,60 +172,97 @@ def add_employee():
     status = request.form['status']
     photo = request.files['photo']
 
+    # ============================
+    # Check duplicate employee no
+    # ============================
+
+    existing_employee = Employee.query.filter_by(
+        employee_no=employee_no
+    ).first()
+
+    if existing_employee:
+
+        flash(
+            "Employee Number already exists!",
+            "danger"
+        )
+
+        return redirect("/")
+
+    # ============================
+    # Upload Photo
+    # ============================
+
     filename = None
     photo_source = None
     cloudinary_public_id = None
 
-    is_cloud = os.getenv("IS_CLOUD", "").strip().lower()
+    is_cloud = os.getenv(
+        "IS_CLOUD",
+        ""
+    ).strip().lower()
 
-    if is_cloud == "true":
+    if photo and photo.filename:
 
-        result = cloudinary.uploader.upload(photo)
+        if is_cloud == "true":
 
-        filename = result["secure_url"]
-        photo_source = "cloudinary"
-        cloudinary_public_id = result["public_id"]
+            result = cloudinary.uploader.upload(photo)
 
-    else:
+            filename = result["secure_url"]
+            photo_source = "cloudinary"
+            cloudinary_public_id = result["public_id"]
 
-        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        else:
 
-        filename = secure_filename(
-            str(uuid.uuid4()) + "_" + photo.filename
-        )
-
-        photo.save(
-         os.path.join(
-             app.config["UPLOAD_FOLDER"],
-             filename
+            os.makedirs(
+                app.config["UPLOAD_FOLDER"],
+                exist_ok=True
             )
-        )
 
-        photo_source = "local"
-    
+            filename = secure_filename(
+                str(uuid.uuid4()) + "_" + photo.filename
+            )
+
+            photo.save(
+                os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    filename
+                )
+            )
+
+            photo_source = "local"
+
+    # ============================
+    # Save Employee
+    # ============================
 
     new_employee = Employee(
-        employee_no = employee_no,
-        first_name = first_name,
-        last_name = last_name,
-        email = email,
-        department = department,
-        position = position,
-        status = status,
+        employee_no=employee_no,
+        first_name=first_name,
+        last_name=last_name,
+        email=email,
+        department=department,
+        position=position,
+        status=status,
         photo=filename,
-        photo_source =photo_source,
-        cloudinary_public_id = cloudinary_public_id
+        photo_source=photo_source,
+        cloudinary_public_id=cloudinary_public_id
     )
+
     db.session.add(new_employee)
+
     add_audit_log(
         f"Added Employee {employee_no}"
     )
+
     db.session.commit()
+
     flash(
-        'Employee Added Successfully!',
-        'success'
+        "Employee Added Successfully!",
+        "success"
     )
-    return redirect('/')
+
+    return redirect("/")
 
 @app.route('/delete/<int:id>')
 def delete_employee(id):
