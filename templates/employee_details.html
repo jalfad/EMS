@@ -1,124 +1,170 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Employee Details</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS — {{ employee.first_name }} {{ employee.last_name }}</title>
+    {% include 'base_styles.html' %}
+    <style>
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+        .profile-photo {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--border2);
+            box-shadow: 0 0 0 4px var(--accent-dim);
+        }
+        .profile-placeholder {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-lt));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: 700; color: #fff;
+            border: 3px solid var(--border2);
+            box-shadow: 0 0 0 4px var(--accent-dim);
+        }
+        .profile-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .profile-info p {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        .profile-info .meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        .detail-item {
+            padding: 18px 32px;
+            border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+        }
+        .detail-item:nth-child(even) { border-right: none; }
+        .detail-item:nth-last-child(-n+2) { border-bottom: none; }
+        .detail-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 0.925rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container mt-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-8">
-
-            <div class="card shadow-sm">
-
-                <div class="card-header">
-                    <h3 class="mb-0">
-                        Employee Profile
-                    </h3>
-                </div>
-
-                <div class="card-body text-center">
-
-                    {% if employee.photo %}
-                        {% if employee.photo_source == "cloudinary" %}
-                            <img 
-                                src="{{ employee.photo }}"
-                                width="150"
-                                height="150"
-                                style="object-fit: cover; border-radius: 50%;"
-                            >
-                        {% else %}
-                            <img 
-                                src="{{ url_for('static', filename='uploads/' + employee.photo)}}"
-                                width="150"
-                                height="150"
-                                style="object-fit: cover; border-radius: 50%;"
-                                >
-                        {% endif %}
-
-                    {% endif %}
-
-                    <h3 class="mt-3 mb-1">
-                        {{ employee.first_name }}
-                        {{ employee.last_name }}
-                    </h3>
-
-                    <p class="text-muted mb-4">
-                        {{ employee.department }}
-                    </p>
-
-                    <hr>
-
-                    <div class="text-start">
-
-                        <p>
-                            <strong>Employee No:</strong>
-                            {{ employee.employee_no }}
-                        </p>
-
-                        <p>
-                            <strong>Email:</strong>
-                            {{ employee.email }}
-                        </p>
-
-                        <p>
-                            <strong>Department:</strong>
-                            {{ employee.department }}
-                        </p>
-
-                        <p>
-                            <strong>Position:</strong>
-                            {{ employee.position }}
-                        </p>
-
-                        <p>
-                            <strong>Status:</strong>
-
-                            {% if employee.status == 'Active' %}
-                                <span class="badge bg-success">
-                                    Active
-                                </span>
-                            {% else %}
-                                <span class="badge bg-danger">
-                                    Inactive
-                                </span>
-                            {% endif %}
-                        </p>
-
-                    </div>
-
-                    <hr>
-
-                    <a
-                        href="/edit/{{ employee.id }}"
-                        class="btn btn-warning">
-                        Edit
-                    </a>
-
-                    <a
-                        href="/"
-                        class="btn btn-secondary">
-                        Back
-                    </a>
-
-                </div>
-
-            </div>
-
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         </div>
+        <div>
+            <div class="sidebar-name">EMS</div>
+            <div class="sidebar-sub">Management</div>
+        </div>
+    </div>
+    <ul class="sidebar-nav">
+        <li><a href="/"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</a></li>
+        <li><a href="/audit-logs"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>Audit Logs</a></li>
+        <li><a href="/export"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>Export Excel</a></li>
+    </ul>
+    <div class="sidebar-footer">
+        <div class="user-chip">
+            <div class="user-avatar">A</div>
+            <div class="user-info">
+                <div class="user-name">Admin</div>
+                <div class="user-role">Administrator</div>
+            </div>
+            <a href="/logout" class="logout-btn" title="Sign out">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            </a>
+        </div>
+    </div>
+</aside>
 
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-title">
+            <h2>Employee Profile</h2>
+            <p>Viewing details for {{ employee.employee_no }}</p>
+        </div>
+        <a href="/" class="btn btn-ghost btn-sm">← Back</a>
     </div>
 
+    <div class="content">
+        <div class="card" style="max-width:640px;">
+            <div class="profile-hero">
+                {% if employee.photo %}
+                    {% if employee.photo_source == "cloudinary" %}
+                        <img class="profile-photo" src="{{ employee.photo }}">
+                    {% else %}
+                        <img class="profile-photo" src="{{ url_for('static', filename='uploads/' + employee.photo) }}">
+                    {% endif %}
+                {% else %}
+                    <div class="profile-placeholder">{{ employee.first_name[0] }}{{ employee.last_name[0] }}</div>
+                {% endif %}
+                <div class="profile-info">
+                    <h2>{{ employee.first_name }} {{ employee.last_name }}</h2>
+                    <p>{{ employee.position }}</p>
+                    <div class="meta">
+                        <span class="badge badge-primary">{{ employee.department }}</span>
+                        {% if employee.status == 'Active' %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Employee No</div>
+                    <div class="detail-value">{{ employee.employee_no }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ employee.email }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Department</div>
+                    <div class="detail-value">{{ employee.department }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Position</div>
+                    <div class="detail-value">{{ employee.position }}</div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;padding:20px 32px;">
+                <a href="/edit/{{ employee.id }}" class="btn btn-warning">Edit Employee</a>
+                <a href="/" class="btn btn-ghost">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
-
 </html>

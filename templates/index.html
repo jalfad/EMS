@@ -1,321 +1,276 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Employee Management System</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS — Dashboard</title>
+    {% include 'base_styles.html' %}
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        </div>
+        <div>
+            <div class="sidebar-name">EMS</div>
+            <div class="sidebar-sub">Management</div>
+        </div>
+    </div>
+    <ul class="sidebar-nav">
+        <li>
+            <a href="/" class="active">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/audit-logs">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                Audit Logs
+            </a>
+        </li>
+        <li>
+            <a href="/export">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
+                Export Excel
+            </a>
+        </li>
+    </ul>
+    <div class="sidebar-footer">
+        <div class="user-chip">
+            <div class="user-avatar">{{ username[0].upper() }}</div>
+            <div class="user-info">
+                <div class="user-name">{{ username }}</div>
+                <div class="user-role">Administrator</div>
+            </div>
+            <a href="/logout" class="logout-btn" title="Sign out">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main">
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" role="alert">
+                <div class="flash-bar {{ category }}">
+                    {% if category == 'success' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    {% else %}
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    {% endif %}
                     {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    </head>
 
-    <body>
-    
-     <div class = "container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="mb-0"> Welcome, {{ username }} </h2>
-
-                <small class="text-muted">
-                    Employee Management Dashboard
-                </small>
-            </div>
-            
-            <a href="/logout" class="btn btn-danger">Logout</a>
+    <div class="topbar">
+        <div class="topbar-title">
+            <h2>Dashboard</h2>
+            <p>Manage your employee records</p>
         </div>
-        <div class="row mb-4">
-            <div class = "col-md-4">
-                <div class="card border-primary shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Total Employees</h6>
-                        <h1 class="fw-bold text-primary">{{ total_employees or 0 }}</h1>
-                    </div>
-                </div>
-            </div>
-            <div class = "col-md-4">
-                <div class = "card border-success shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h6 class="text-muted">Active Employees</h6>
-                        <h1 class="fw-bold text-success">{{ active_employees or 0 }}</h1>
-                    </div>
-                </div>
-            </div>
-            <div class = "col-md-4">
-                <div class = "card border-danger shadow-sm h-100">
-                    <div class = "card-body text-center">
-                        <h6 class="text-muted"> Inactive Employees</h6>
-                        <h1 class="fw-bold text-danger">{{ inactive_employees or 0  }}</h1>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <h1 class="mb-4">Employee Management System</h1>
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"> Add Employee</h5>
-            </div>
-            <div class="card-body">
-                <form action="/add" method ="POST" enctype="multipart/form-data">
-                    
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <input 
-                        class="form-control" 
-                        type="text"
-                        name="employee_no"
-                        placeholder="Employee No"
-                        required
-                        >
-                </div>
-                <div class="col-md-6 mb-3">
-                    <input
-                        class="form-control" 
-                        type="text"
-                        name="first_name"
-                        placeholder="First Name"
-                        required
-                    >
-                </div>
-            </div>
-            <div class="row">
-                <div class = "col-md-6 mb-3">
-                    <input
-                        class="form-control"
-                        type="text"
-                        name = "last_name"
-                        placeholder="Last Name"
-                        required
-                    >
-                </div>
-                <div class = "col-md-6 mb-3">
-                    <input
-                        class="form-control"
-                        type="email"
-                        name = "email"
-                        placeholder="Email"
-                        required
-                    >
-                </div>
-            </div>
-        <div class="row">
-            <div class = "col-md-6 mb-3">
-                <select name="department" class="form-control" required>
-                    <option value="">Select Department</option>
-                    <option value="IT">IT</option>
-                    <option value="HR">HR</option>
-                    <option value="Accounting">Accounting</option>
-                    <option value="Finance">Finance</option>
-                </select>
-            </div>
-            <div class = "col-md-6 mb-3">
-                <input
-                    class="form-control" 
-                    type="text"
-                    name="position"
-                    placeholder="Position"
-                >          
-            </div>
-        </div>
-        <div class="row">
-            
-            <div class="col-md-6 mb-3">
-                <input 
-                    type="file"
-                    name="photo"
-                    class="form-control"
-                >
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <select name="status" class="form-control" required>
-                    <option value="">Select Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-
-            </div>
-        </div>
-            
-           <div class="text-center">
-                <button class="btn btn-primary px-5"> Add Employee </button>
-           </div>
-
-
-        </form>
-            </div>
-        </div>
-        
-        
-        <hr>
-        <form method="GET">
-
-    <div class="row mb-4 align-items-center">
-
-        <div class="col-md-4">
-            <input
-                type="text"
-                class="form-control"
-                name="search"
-                placeholder="Search Employee"
-                value="{{ search }}"
-            >
-        </div>
-
-        <div class="col-md-2">
-            <button
-                class="btn btn-success w-100"
-                type="submit"
-            >
-                Search
-            </button>
-        </div>
-
-        <div class="col-md-2">
-            <a
-                href="/export"
-                class="btn btn-success w-100"
-            >
-                Export Excel
-            </a>
-        </div>
-
-        <div class="col-md-2">
-            <a
-                href="/audit-logs"
-                class="btn btn-dark w-100"
-            >
-                Audit Logs
-            </a>
-        </div>
-
     </div>
 
-</form>
-     <table class="table table-bordered table-hover align-middle">
+    <div class="content">
 
-        <thead class="table-dark text-center">
-            <tr>
-                <th class="text-center">Photo</th>
-                <th class="text-center">Emp No</th>
-                <th class="text-center">First Name</th>
-                <th class="text-center">Last Name</th>
-                <th class="text-center">Email</th>
-                <th class="text-center">Department</th>
-                <th class="text-center">Position</th>
-                <th class="text-center">Status</th>
-                <th class="text-center">Actions</th>
-                
-            </tr>
-        </thead>
-     <tbody>
-    {% if employees.items %}
-        {% for employee in employees.items %}
-        <tr>
-            <td>
-                {% if employee.photo %}
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div>
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value">{{ total_employees or 0 }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div>
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value" style="color:var(--success)">{{ active_employees or 0 }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                </div>
+                <div>
+                    <div class="stat-label">Inactive</div>
+                    <div class="stat-value" style="color:var(--danger)">{{ inactive_employees or 0 }}</div>
+                </div>
+            </div>
+        </div>
 
-                    {% if employee.photo.startswith('http') %}
+        <!-- Add Employee Form -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Add Employee</h3>
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;color:var(--muted)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+            <div class="card-body">
+                <form action="/add" method="POST" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Employee No</label>
+                            <input type="text" name="employee_no" placeholder="e.g. EMP-001" required>
+                        </div>
+                        <div class="field">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" placeholder="First name" required>
+                        </div>
+                        <div class="field">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" placeholder="Last name" required>
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input type="email" name="email" placeholder="email@company.com" required>
+                        </div>
+                        <div class="field">
+                            <label>Department</label>
+                            <select name="department" required>
+                                <option value="">Select department</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="Accounting">Accounting</option>
+                                <option value="Finance">Finance</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Position</label>
+                            <input type="text" name="position" placeholder="Job title" required>
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select name="status" required>
+                                <option value="">Select status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Photo</label>
+                            <input type="file" name="photo" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <button type="submit" class="btn btn-accent">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            Add Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-                    <img
-                        src="{{ employee.photo }}"
-                        width="60"
-                        height="60"
-                        style="object-fit:cover;border-radius:50%;"
-                        onerror="this.style.border='2px solid red';"
-                    >
+        <!-- Employee Table -->
+        <div class="card">
+            <div class="toolbar">
+                <form method="GET" style="display:flex;gap:10px;align-items:center;flex:1;flex-wrap:wrap;">
+                    <div class="search-wrap">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        <input type="text" name="search" placeholder="Search employees…" value="{{ search }}">
+                    </div>
+                    <button type="submit" class="btn btn-ghost btn-sm">Search</button>
+                </form>
+            </div>
 
-                    {% else %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Emp No</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if employees.items %}
+                            {% for emp in employees.items %}
+                            <tr>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:10px;">
+                                        {% if emp.photo %}
+                                            {% if emp.photo.startswith('http') %}
+                                                <img class="emp-avatar" src="{{ emp.photo }}" onerror="this.style.display='none'">
+                                            {% else %}
+                                                <img class="emp-avatar" src="{{ url_for('static', filename='uploads/' + emp.photo) }}" onerror="this.style.display='none'">
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="emp-avatar-placeholder">{{ emp.first_name[0] }}{{ emp.last_name[0] }}</div>
+                                        {% endif %}
+                                        <span class="text-main" style="color:var(--text);font-weight:600;">{{ emp.first_name }} {{ emp.last_name }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ emp.employee_no }}</td>
+                                <td>{{ emp.email }}</td>
+                                <td>{{ emp.department }}</td>
+                                <td>{{ emp.position }}</td>
+                                <td>
+                                    {% if emp.status == 'Active' %}
+                                        <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:6px;">
+                                        <a href="/employee/{{ emp.id }}" class="btn btn-info btn-sm">View</a>
+                                        <a href="/edit/{{ emp.id }}" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="/delete/{{ emp.id }}" class="btn btn-danger-ghost btn-sm" onclick="return confirm('Delete this employee?')">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" style="text-align:center;padding:48px;color:var(--muted);">
+                                    No employees found.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
 
-                        <img
-                            src="{{ url_for('static', filename='uploads/' + employee.photo) }}"
-                            width="60"
-                            height="60"
-                            style="object-fit:cover;border-radius:50%;"
-                            onerror="this.style.border='2px solid red';"
-                        >
+            <!-- Pagination -->
+            <div class="pagination">
+                {% if employees.has_prev %}
+                    <a href="?page={{ employees.prev_num }}&search={{ search }}" class="page-btn">← Prev</a>
+                {% else %}
+                    <span class="page-btn disabled">← Prev</span>
+                {% endif %}
 
+                {% for num in employees.iter_pages() %}
+                    {% if num %}
+                        <a href="?page={{ num }}&search={{ search }}" class="page-btn {% if num == employees.page %}active{% endif %}">{{ num }}</a>
                     {% endif %}
+                {% endfor %}
 
+                {% if employees.has_next %}
+                    <a href="?page={{ employees.next_num }}&search={{ search }}" class="page-btn">Next →</a>
                 {% else %}
-
-                    No Photo
-
+                    <span class="page-btn disabled">Next →</span>
                 {% endif %}
+            </div>
+        </div>
 
+    </div><!-- /content -->
+</div><!-- /main -->
 
-            </td>
-            <td class="text-center" >{{ employee.employee_no }} </td>
-            <td class="text-center" >{{ employee.first_name }}</td>
-            <td class="text-center">{{ employee.last_name }}</td>
-            <td class="text-center">{{ employee.email }}</td>
-            <td class="text-center">{{ employee.department }}</td>
-            <td class="text-center">{{ employee.position }}</td>
-            <td class="text-center">
-                {% if employee.status == 'Active' %}
-
-                    <span class="badge bg-success">Active</span>
-
-                {% else %}
-
-                    <span class="badge bg-danger">Inactive</span>
-
-                {% endif %}
-            </td>
-           
-            <td class="text-center" >
-                <a class = "btn btn-warning btn-sm" href="/edit/{{ employee.id }}">
-                    Edit
-                </a>
-                <a href="/delete/{{employee.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this employee?')">
-                    Delete
-                </a>
-                <a href="/employee/{{ employee.id }}" class="btn btn-info btn-sm"> 
-                    View 
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    {% else %}
-    <tr>
-        <td colspan="9" class="text-center text-muted py-4">
-            No employees found.
-        </td>
-    </tr>
-    {% endif %}
-     </tbody>
-     </table>
-     <nav>
-        <ul class="pagination justify-content-center">
-            {% if employees.has_prev %}
-            <li class="page-item">
-                <a href="?page={{ employees.prev_num }} &search={{ search }}"  class="page-link"> Previous </a>
-            </li>
-            {% endif %}
-            {% for num in employees.iter_pages() %}
-                {% if num %}
-                    <li 
-                        class="page-item
-                        {% if num == employees.page %}
-                        active
-                        {% endif %}"
-                    >
-                    <a href="?page={{ num }}&search={{ search }}" class="page-link"> {{ num }} </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if employees.has_next %}
-            <li class="page-item">
-                <a href="?page={{ employees.next_num }} &search={{ search }}" class="page-link"> Next </a>
-            </li>
-            {% endif %}
-        </ul>
-     </nav>
-     </div>
-    </body>
+</body>
 </html>
