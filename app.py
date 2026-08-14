@@ -27,10 +27,10 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
-from flask_migrate import upgrade
+#from flask_migrate import upgrade
 
-with app.app_context():
-    upgrade()
+#with app.app_context():
+#    upgrade()
 cloudinary.config(
     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key=os.getenv("CLOUDINARY_API_KEY"),
